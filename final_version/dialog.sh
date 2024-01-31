@@ -10,6 +10,7 @@ readonly UP='\033[A'
 
 dialog_welcome()
 {
+    clear
     echo -e "${YELLOW}"
     echo "    _              _                                             _               ";
     echo "   | |            | |                                           | |              ";
