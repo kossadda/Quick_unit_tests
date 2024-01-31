@@ -61,3 +61,10 @@ dialog_entering_param()
     entering_project_name
     entering_testing_func
 }
+
+dialog()
+{
+    dialog_welcome
+    dialog_brief
+    dialog_entering_param
+}
