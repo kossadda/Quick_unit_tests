@@ -42,7 +42,7 @@ delete_up()
 
 entering_project_name()
 {
-    bold_print "Enter the project name:"
+    bold_print "Enter the project name (example: s21_math):"
     read project_name
     delete_up
     echo -e "${BOLD}Project name: ${YELLOW}${project_name}${RESET}"
