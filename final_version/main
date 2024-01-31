@@ -1,0 +1,11 @@
+#!/bin/bash
+
+main()
+{
+    source ./dialog.sh
+    dialog_welcome
+    dialog_brief
+    dialog_entering_param
+}
+
+main 

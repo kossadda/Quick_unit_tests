@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# $1 - тестируемая функция
+# $2 - тестируемое значение
+# $3 - номер первого теста
+# $4 - номер кейса
+# $5 - шаг
+# $6 - название проекта
+main()
+{
+    local -r FUNC=${1}
+    local value=${2}
+    local start_test=${3}
+    local -r DIFF=${5}
+
+    local result
+
+    rm -f ${FUNC}_test.c test
+
+    source ./print.sh
+    gcc ./test_module.c -o test -lm
+
+    for(( i = 0; i < 100; i++ )); do
+        result=$(compile ${value})
+        print_test ${FUNC} ${value} ${result} ${start_test} >> ${FUNC}_test.c
+
+        ((start_test++))
+        value=$(echo "${value} + ${DIFF}" | bc)
+        if [[ ${value:0:1} == "." ]]; then
+            value="0${value}"
+        fi
+    done
+
+    suite_creator ${2} ${value} ${DIFF} ${FUNC} ${4} ${6} ${3} >> ${FUNC}_test.c
+}
+
+main $@
