@@ -50,7 +50,7 @@ entering_project_name()
 
 entering_testing_func()
 {
-    bold_print "Enter testing function:"
+    bold_print "Enter testing function (example: log):"
     read testing_func
     delete_up
     echo -e "${BOLD}Testing function: ${YELLOW}${testing_func}${RESET}"
