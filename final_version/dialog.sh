@@ -63,6 +63,14 @@ entering_testing_func()
     echo -e "${BOLD}Testing function: ${YELLOW}${testing_func}${RESET}"
 }
 
+entering_argument()
+{
+    bold_print "Enter the argument of the testing function (example: log(1.1)):"
+    read argument
+    delete_up
+    echo -e "${BOLD}Argument: ${YELLOW}${argument}${RESET}"
+}
+
 dialog_entering_param()
 {
     entering_project_name
@@ -74,4 +82,5 @@ dialog()
     dialog_welcome
     dialog_brief
     dialog_entering_param
+    entering_argument
 }
