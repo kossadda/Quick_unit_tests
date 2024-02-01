@@ -65,7 +65,8 @@ entering_testing_func()
 
 entering_argument()
 {
-    bold_print "Enter the argument of the testing function (example: log(1.1)):"
+    bold_print "Enter the argument of the testing function (example: \
+log(1.1)):"
     read argument
     delete_up
     echo -e "${BOLD}Argument: ${YELLOW}${argument}${RESET}"
@@ -77,10 +78,29 @@ dialog_entering_param()
     entering_testing_func
 }
 
+comparison_function()
+{
+    bold_print "Enter the name of your own comparison function with\
+the original function (example: s21_test_log)"
+    read comparison_func
+    delete_up
+    echo -e "${BOLD}Comparison function: ${YELLOW}${comparison_func}${RESET}"
+}
+
+entering_test_number()
+{
+    bold_print "Enter the number of the first test (example 3)"
+    read test_number
+    delete_up
+    echo -e "${BOLD}Argument: ${YELLOW}${test_number}${RESET}"
+}
+
 dialog()
 {
     dialog_welcome
     dialog_brief
     dialog_entering_param
     entering_argument
+    entering_test_number
+    comparison_function
 }
