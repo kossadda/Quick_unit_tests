@@ -52,7 +52,3 @@ dialog_function_name()
   print_param "Function name" ${FUNCTION}
 }
 
-generate_list_for_header()
-{
-  echo "Suite *s21_${FUNCTION}_${CASE_NUMBER}_case(void);"
-}

@@ -10,23 +10,30 @@ main()
   dialog_brief
   dialog_project_name
   dialog_function_name
-  generate_case >> "${TEST_FUNCTION}_suite.c"
-  generate_list_for_header >> s21_test_${FUNCTION}.h
-  local value=${START_VALUE}
-  local end_test=$((FIRST_TEST_NUMBER + 100))
+  local value
+  local end_test
 
-  for (( i = FIRST_TEST_NUMBER; i < end_test; i++ )); do
-    generate_tcase ${i} >> "${TEST_FUNCTION}_suite.c"
+  for (( i = 0; i < ${#START_VALUE[@]}; i++)); do
+    value=${START_VALUE[$i]}
+    end_test=$(( ${FIRST_TEST_NUMBER[$i]} + 100))
+    generate_case ${i} >> "${TEST_FUNCTION}_suite.c"
+    generate_list_for_header ${i} >> s21_test_${FUNCTION}.h
 
-    compile ${value}
-    generate_test ${value} ${i} >> "${TEST_FUNCTION}.c"
+    for (( j = ${FIRST_TEST_NUMBER[i]}; j < end_test; j++ )); do
+      
+      generate_tcase ${j} >> "${TEST_FUNCTION}_suite.c"
 
-    value=$(echo "${value} + ${STEP}" | bc)
+      compile ${value}
+      
+      generate_test ${value} ${j} >> "${TEST_FUNCTION}.c"
 
-    if [[ ${value:0:1} == "." ]]; then
-      value="0${value}"
-    fi
+      value=$(echo "${value} + ${STEP[$i]}" | bc)
 
+      if [[ ${value:0:1} == "." ]]; then
+        value="0${value}"
+      fi
+
+    done
   done
 
   generate_end >> "${TEST_FUNCTION}_suite.c"

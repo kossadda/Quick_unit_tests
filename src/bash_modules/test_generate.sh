@@ -1,5 +1,5 @@
 #!/bin/bash
-
+source ../configuration.conf
 compile()
 {
   gcc ./c_modules/test_module.c -o test -lm
@@ -22,13 +22,13 @@ generate_case()
 {
   echo
   echo "/**"
-  echo " * @brief ${CASE_NUMBER} set of tests"
+  echo " * @brief ${CASE_NUMBER[$1]} set of tests"
   echo " *"
   echo " * @return Suite*"
   echo " */"
-  echo "Suite *s21_${FUNCTION}_${CASE_NUMBER}_case(void)"
+  echo "Suite *s21_${FUNCTION}_${CASE_NUMBER[$1]}_case(void)"
   echo "{"
-  echo "    Suite *${SUITE_NAME} = suite_create(\"\\n${PROJECT_NAME} (s21_${FUNCTION} ${CASE_NUMBER} case)\\n\");"
+  echo "    Suite *${SUITE_NAME} = suite_create(\"\\n${PROJECT_NAME} (s21_${FUNCTION} ${CASE_NUMBER[$1]} case)\\n\");"
 
   echo
   echo "    TCase *tc_${FUNCTION} = tcase_create(\"test_${FUNCTION}\");"
@@ -45,4 +45,9 @@ generate_end()
   echo
   echo "    return ${SUITE_NAME};"
   echo "}"
+}
+
+generate_list_for_header()
+{
+  echo "Suite *s21_${FUNCTION}_${CASE_NUMBER[$1]}_case(void);"
 }
