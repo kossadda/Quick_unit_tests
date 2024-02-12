@@ -11,9 +11,11 @@ main()
   dialog_project_name
   dialog_function_name
   generate_case >> "${TEST_FUNCTION}_suite.c"
-  local value=${START_VALUE}
 
-  for (( i = 0; i < 100; i++ )); do
+  local value=${START_VALUE}
+  local end_test=$((FIRST_TEST_NUMBER + 100))
+
+  for (( i = FIRST_TEST_NUMBER; i < end_test; i++ )); do
     generate_tcase ${i} >> "${TEST_FUNCTION}_suite.c"
 
     compile ${value}
