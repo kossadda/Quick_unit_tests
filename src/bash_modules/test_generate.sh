@@ -63,5 +63,5 @@ generate_array_end()
 
 generate_array()
 {
-  echo "    s21_${FUNCTION}_${CASE_NUMBER[$1]}_case"
+  echo "    s21_${FUNCTION}_${CASE_NUMBER[$1]}_case,"
 }

@@ -38,7 +38,7 @@ main()
   generate_array_end >> ./result/s21_tests.c
 
   cat ./result/${TEST_FUNCTION}_tmp.c ./result/${TEST_FUNCTION}_suite_tmp.c > ./result/${TEST_FUNCTION}.c
-	# rm -f ./result/${TEST_FUNCTION}_tmp.c
-	# rm -f ./result/${TEST_FUNCTION}_suite_tmp.c
+	rm -f ./result/${TEST_FUNCTION}_tmp.c
+	rm -f ./result/${TEST_FUNCTION}_suite_tmp.c
 }
 main
