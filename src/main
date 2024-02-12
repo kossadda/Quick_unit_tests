@@ -1,0 +1,32 @@
+#!/bin/bash
+
+main()
+{
+  source ./configuration.conf
+  source ./bash_modules/test_generate.sh
+
+  source ./bash_modules/dialog.sh
+  dialog_welcome
+  dialog_brief
+  dialog_project_name
+  dialog_function_name
+  generate_case >> "${TEST_FUNCTION}_suite.c"
+  local value=${START_VALUE}
+
+  for (( i = 0; i < 100; i++ )); do
+    generate_tcase ${i} >> "${TEST_FUNCTION}_suite.c"
+
+    compile ${value}
+    generate_test ${value} ${i} >> "${TEST_FUNCTION}.c"
+
+    value=$(echo "${value} + ${STEP}" | bc)
+
+    if [[ ${value:0:1} == "." ]]; then
+      value="0${value}"
+    fi
+
+  done
+
+  generate_end >> "${TEST_FUNCTION}_suite.c"
+}
+main
