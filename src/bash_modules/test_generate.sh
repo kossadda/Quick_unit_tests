@@ -26,11 +26,12 @@ generate_case()
   echo " *"
   echo " * @return Suite*"
   echo " */"
-  echo "Suite *${PROJECT_NAME}_${CASE_NUMBER}_case(void)"
+  echo "Suite *s21_${FUNCTION}_${CASE_NUMBER}_case(void)"
   echo "{"
   echo "    Suite *${SUITE_NAME} = suite_create(\"\\n${PROJECT_NAME} (s21_${FUNCTION} ${CASE_NUMBER} case)\\n\");"
+
   echo
-  echo "    TCase *tc_${FUNCTION} = tcase_create("test_${FUNCTION}");"
+  echo "    TCase *tc_${FUNCTION} = tcase_create(\"test_${FUNCTION}\");"
 }
 
 generate_tcase()
