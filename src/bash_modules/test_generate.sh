@@ -9,7 +9,7 @@ compile()
 generate_test()
 {
   echo "/// @brief \f[ ${FUNCTION}(${1}) = ${result} \f]"
-  echo "START_TEST(${FUNCTION}_${2})"
+  echo "START_TEST(s21_${FUNCTION}_${2})"
   echo "{"
   echo "    double value = ${1};"
   echo
