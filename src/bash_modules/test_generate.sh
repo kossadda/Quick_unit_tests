@@ -1,5 +1,5 @@
 #!/bin/bash
-source ../configuration.conf
+
 compile()
 {
   gcc ./c_modules/test_module.c -o test -lm
@@ -50,4 +50,18 @@ generate_end()
 generate_list_for_header()
 {
   echo "Suite *s21_${FUNCTION}_${CASE_NUMBER[$1]}_case(void);"
+}
+
+generate_array_start()
+{
+  echo "Suite *(*s21_${FUNCTION}[])(void) = {"
+}
+generate_array_end()
+{
+  echo "};"
+}
+
+generate_array()
+{
+  echo "    s21_${FUNCTION}_${CASE_NUMBER[$1]}_case"
 }

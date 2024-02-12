@@ -5,27 +5,25 @@ main()
   source ./configuration.conf
   source ./bash_modules/test_generate.sh
 
-  source ./bash_modules/dialog.sh
-  dialog_welcome
-  dialog_brief
-  dialog_project_name
-  dialog_function_name
+  generate_array_start >> ./result/s21_tests.c
+
   local value
   local end_test
 
   for (( i = 0; i < ${#START_VALUE[@]}; i++)); do
+    generate_array ${i} >> ./result/s21_tests.c
     value=${START_VALUE[$i]}
     end_test=$(( ${FIRST_TEST_NUMBER[$i]} + 100))
-    generate_case ${i} >> "${TEST_FUNCTION}_suite.c"
-    generate_list_for_header ${i} >> s21_test_${FUNCTION}.h
+    generate_case ${i} >> "./result/${TEST_FUNCTION}_suite_tmp.c"
+    generate_list_for_header ${i} >> ./result/${TEST_FUNCTION}.h
 
     for (( j = ${FIRST_TEST_NUMBER[i]}; j < end_test; j++ )); do
       
-      generate_tcase ${j} >> "${TEST_FUNCTION}_suite.c"
+      generate_tcase ${j} >> "./result/${TEST_FUNCTION}_suite_tmp.c"
 
       compile ${value}
       
-      generate_test ${value} ${j} >> "${TEST_FUNCTION}.c"
+      generate_test ${value} ${j} >> "./result/${TEST_FUNCTION}_tmp.c"
 
       value=$(echo "${value} + ${STEP[$i]}" | bc)
 
@@ -34,8 +32,13 @@ main()
       fi
 
     done
+    generate_end >> "./result/${TEST_FUNCTION}_suite_tmp.c"
   done
 
-  generate_end >> "${TEST_FUNCTION}_suite.c"
+  generate_array_end >> ./result/s21_tests.c
+
+  cat ./result/${TEST_FUNCTION}_tmp.c ./result/${TEST_FUNCTION}_suite_tmp.c > ./result/${TEST_FUNCTION}.c
+	# rm -f ./result/${TEST_FUNCTION}_tmp.c
+	# rm -f ./result/${TEST_FUNCTION}_suite_tmp.c
 }
 main
