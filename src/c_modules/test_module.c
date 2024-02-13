@@ -7,7 +7,7 @@ int main(int argc, char **argv)
 {
     double value = atof(argv[1]);
 
-    long double result = log(value);
+    long double result = asin(value);
 
     printf("%Lf", result);
     
