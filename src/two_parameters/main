@@ -1,0 +1,48 @@
+#!/bin/bash
+
+main()
+{
+  source ./configuration.conf
+  source ./bash_modules/test_generate.sh
+
+  generate_array_start >> ./result/s21_tests.c
+
+  local value
+  local end_test
+
+  for (( i = 0; i < ${#START_VALUE[@]}; i++)); do
+    generate_array ${i} >> ./result/s21_tests.c
+    value=${START_VALUE[$i]}
+    end_test=$(( ${FIRST_TEST_NUMBER[$i]} + 100))
+    generate_case ${i} >> "./result/${TEST_FUNCTION}_suite_tmp.c"
+    generate_list_for_header ${i} >> ./result/${TEST_FUNCTION}.h
+
+    for (( j = ${FIRST_TEST_NUMBER[i]}; j < end_test; j++ )); do
+      
+      generate_tcase ${j} >> "./result/${TEST_FUNCTION}_suite_tmp.c"
+
+      compile ${CONST_VALUE} ${value}
+      
+      generate_test ${value} ${j} >> "./result/${TEST_FUNCTION}_tmp.c"
+
+      value=$(echo "${value} + ${STEP[$i]}" | bc)
+
+      if [[ ${value:0:1} == "." ]]; then
+        value="0${value}"
+      fi
+
+      if [[ ${value} == "-."* ]]; then
+        value="-0${value:1}"
+      fi
+
+    done
+    generate_end >> "./result/${TEST_FUNCTION}_suite_tmp.c"
+  done
+
+  generate_array_end >> ./result/s21_tests.c
+
+  cat ./result/${TEST_FUNCTION}_tmp.c ./result/${TEST_FUNCTION}_suite_tmp.c > ./result/${TEST_FUNCTION}.c
+	rm -f ./result/${TEST_FUNCTION}_tmp.c
+	rm -f ./result/${TEST_FUNCTION}_suite_tmp.c
+}
+main
