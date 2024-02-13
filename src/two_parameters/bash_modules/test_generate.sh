@@ -9,10 +9,10 @@ compile()
 
 generate_test()
 {
-  echo "/// @brief \f[ ${FUNCTION}(${CONST_VALUE}, ${1}) = ${result} \f]"
+  echo "/// @brief \f[ ${FUNCTION}(${CONST_VALUE[$3]}, ${1}) = ${result} \f]"
   echo "START_TEST(s21_${FUNCTION}_${2})"
   echo "{"
-  echo "    double base = ${CONST_VALUE};"
+  echo "    double base = ${CONST_VALUE[$3]};"
   echo "    double exp = ${1};"
   echo
   echo "    ${TEST_FUNCTION}(base, exp);"

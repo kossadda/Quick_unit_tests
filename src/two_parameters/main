@@ -21,9 +21,9 @@ main()
       
       generate_tcase ${j} >> "./result/${TEST_FUNCTION}_suite_tmp.c"
 
-      compile ${CONST_VALUE} ${value}
+      compile ${CONST_VALUE[$i]} ${value}
       
-      generate_test ${value} ${j} >> "./result/${TEST_FUNCTION}_tmp.c"
+      generate_test ${value} ${j} ${i} >> "./result/${TEST_FUNCTION}_tmp.c"
 
       value=$(echo "${value} + ${STEP[$i]}" | bc)
 
