@@ -1,0 +1,9 @@
+#!/bin/bash
+
+main()
+{
+  source ./configuration.conf
+  source ./test_generate.sh
+
+}
+main
