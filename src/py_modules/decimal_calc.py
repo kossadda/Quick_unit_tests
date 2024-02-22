@@ -14,7 +14,7 @@ def decimal_to_float(func):
 
   print("// ", func, "(", num, ") = ", res, sep="")
   print(hex_num)
-  print("  int res =", res)
+  print("  float result = ", res, ";", sep="")
   print("  int error_code = ", code, ";", sep="")
 
 # Convert operation "decimal_to_int".
@@ -34,7 +34,7 @@ def decimal_to_int(func):
 
   print("// ", func, "(", sys.argv[1], ") = ", res, sep="")
   print(hex_num)
-  print("  int result = ", res)
+  print("  int result = ", res, ";", sep="")
   print("  int error_code = ", code, ";", sep="")
 
 # Convert "int_to_decimal".
@@ -52,7 +52,7 @@ def int_to_decimal(func):
     hex_res, temp = decimal_to_hex_string(res, "result")
 
   print("// ", func, "(", num, ") = ", res, sep="")
-  print("  int value = ", num)
+  print("  int value = ", num, ";", sep="")
   print(hex_res)
   print("  int error_code = ", code, ";", sep="")
 
@@ -104,10 +104,9 @@ def float_to_decimal(func):
   hex_res, code = decimal_to_hex_string(res, "result")
 
   print("// ", func, "(", num, ") = ", res, sep="")
-  print("  float value = ", num)
+  print("  float value = ", num, ";", sep="")
   print(hex_res)
   print("  int error_code = ", code, ";", sep="")
-
 
 # Round operations ("round", "floor", "truncate", "negate").
 def round_operations(func):
@@ -135,7 +134,7 @@ def round_operations(func):
 
 # Arithmetic & comparisons (common function for call).
 def binary_operations(func):
-  getcontext().prec = 60
+  getcontext().prec = 29
 
   num1 = Decimal(sys.argv[1])
   num2 = Decimal(sys.argv[3])
@@ -186,7 +185,7 @@ def comparison(num1, num2, func):
   hex1 = decimal_to_hex_string(num1, "value_1")
   hex2 = decimal_to_hex_string(num2, "value_2")
 
-  print("//", num1, func, num2, "=", code)
+  print("// (", num1, func, num2, ") =", code)
   code *= 1
   print(hex1)
   print(hex2)

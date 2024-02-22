@@ -2,8 +2,44 @@
 
 main()
 {
+  if ! [[ -d "dist" ]]; then
+    make
+  fi
+
   source ./configuration.conf
   source ./test_generate.sh
+  
+  if [[ ${TEST_TYPE} == "binary" ]]; then
+    for ((i = ${TEST_BEGIN}; i < ((${NUMBER_OF_TESTS} + ${TEST_BEGIN})); i++)); do
+      (generate_binary_test "${i}") >> tests.txt
+    done
+  else
+    for ((i = ${TEST_BEGIN}; i < ((${NUMBER_OF_TESTS} + ${TEST_BEGIN})); i++)); do
+      (generate_non_binary_test "${i}") >> tests.txt
+    done
+  fi
 
+  echo "#############################################################################" >> tests.txt
+  echo "#############################################################################" >> tests.txt
+  echo "#############################################################################" >> tests.txt
+
+  count=${TEST_BEGIN}
+
+  for ((i = 1; end_count != TEST_END; i++)); do
+    (generate_case ${i}) >> tests.txt
+    end_count=$((count + 99))
+
+    if ((end_count > TEST_END)); then
+      end_count=${TEST_END}
+    fi
+
+    for ((j = count; j <= end_count; j++)); do
+      (generate_tcase "${j}") >> tests.txt
+    done
+
+    count=$((end_count + 1))
+    generate_end >> tests.txt
+  done
 }
 main
+

@@ -1,44 +1,57 @@
 #!/bin/bash
 
-compile()
+source ./generate_number.sh
+
+generate_binary_test()
 {
-  gcc ./c_modules/test_module.c -o test -lm
-  result=$(./test ${1})
+  echo "START_TEST(${FUNCTION}_${1})"
+  echo "{"
+  ./dist/decimal_calc/decimal_calc $(generate_float_decimal) "${OPERATION}" $(generate_float_decimal)
+  echo
+  echo "  ${TEST_FUNCTION}(value_1, value_2, result, code);"
+  echo "}"
+  echo
 }
 
-generate_test()
+generate_non_binary_test()
 {
-  echo "/// ${1} + ${2} = ${3}"
-  echo "START_TEST(${FUNCTION}_${7})"
+  local value="0"
+
+  if [[ ${OPERATION} == "int_to_decimal" ]]; then
+    value=$(generate_int)
+  else
+    value=$(generate_float_decimal)
+  fi
+
+  echo "START_TEST(${FUNCTION}_${1})"
   echo "{"
-  echo "    s21_decimal value_1 = ${4};"
-  echo "    s21_decimal value_2 = ${5};"
-  echo "    s21_decimal result = ${6};"
+  ./dist/decimal_calc/decimal_calc ${value} "${OPERATION}"
   echo
-  echo "    ${TEST_FUNCTION}(value_1, value_2, &result);"
+  echo "  ${TEST_FUNCTION}(value_1, result, code);"
   echo "}"
   echo
 }
 
 generate_case()
 {
+  CASE_NUMBER=$1
   echo
   echo "/**"
-  echo " * @brief ${CASE_NUMBER[$1]} set of tests"
+  echo " * @brief Set №${CASE_NUMBER} of ${SUITE_NAME} tests"
   echo " *"
   echo " * @return Suite*"
   echo " */"
-  echo "Suite *s21_${FUNCTION}_${CASE_NUMBER[$1]}_case(void)"
+  echo "Suite *${FUNCTION}_case_${CASE_NUMBER}(void)"
   echo "{"
-  echo "    Suite *${SUITE_NAME} = suite_create(\"\\n${PROJECT_NAME} (s21_${FUNCTION} ${CASE_NUMBER[$1]} case)\\n\");"
+  echo "    Suite *${SUITE_NAME} = suite_create(\"\\n${PROJECT_NAME} (${FUNCTION} case №${CASE_NUMBER})\\n\");"
 
   echo
-  echo "    TCase *tc_${FUNCTION} = tcase_create(\"test_${FUNCTION}\");"
+  echo "    TCase *tc_${FUNCTION} = tcase_create(\"${FUNCTION}_test\");"
 }
 
 generate_tcase()
 {
-  echo "    tcase_add_test(tc_${FUNCTION}, s21_${FUNCTION}_${1});"
+  echo "    tcase_add_test(tc_${FUNCTION}, ${FUNCTION}_${1});"
 }
 
 generate_end()
@@ -58,6 +71,7 @@ generate_array_start()
 {
   echo "Suite *(*s21_${FUNCTION}[])(void) = {"
 }
+
 generate_array_end()
 {
   echo "};"
@@ -68,33 +82,3 @@ generate_array()
   echo "    s21_${FUNCTION}_${CASE_NUMBER[$1]}_case,"
 }
 
-generate_num()
-{
-  local VALUE_1
-  
-  for ((i = 0; i < 28; i++)); do
-    VALUE_1="${VALUE_1}$((RANDOM % 10))"
-
-    if ((VALUE_1 == "0")); then
-      VALUE_1=""
-    fi
-
-    if ((((RANDOM % 15)) == 0)); then
-      break
-    fi
-  done
-
-  echo -n ${VALUE_1}
-}
-
-generate_decimal_1()
-{
-  VALUE_1=$(generate_num)
-  DECIMAL_1=$(./test_module/test_module ${VALUE_1})
-}
-
-generate_decimal_2()
-{
-  VALUE_2=$(generate_num)
-  DECIMAL_2=$(./test_module/test_module ${VALUE_2})
-}

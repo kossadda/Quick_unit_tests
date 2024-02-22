@@ -11,4 +11,4 @@ dir:
 clean:
 	@rm -rf result
 	@rm -f test
-	@rm -rf ./build ./dist ./*.spec
+	@rm -rf ./build ./dist ./*.spec ./*.txt
