@@ -1,3 +1,8 @@
+install:
+	rm -rf ./build ./dist ./*.spec
+	pyinstaller ./py_modules/decimal_calc.py
+	clear
+
 run: clean dir
 	@./main
 

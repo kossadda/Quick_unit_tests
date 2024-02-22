@@ -1,43 +1,126 @@
 import sys
-from decimal import Decimal, getcontext, ROUND_DOWN
+from decimal import Decimal, getcontext, ROUND_DOWN, ROUND_HALF_EVEN, ROUND_FLOOR
 
-getcontext().prec = 60
+def int_to_decimal(func):
+  getcontext().prec = 28
 
+  num = Decimal(sys.argv[1])
+  res = num
+
+# Convertation operations ("from_int_to_decimal", "from_decimal_to_int", "from_float_to_decimal", "from_decimal_to_float")
+def float_to_decimal(func):
+  getcontext().prec = 28
+
+  num = Decimal(sys.argv[1])
+  res = num
+  exponent = 0
+
+  def integer_part(decimal_number):
+    number_str = str(abs(decimal_number))
+    dot_position = number_str.find('.')
+    
+    if decimal_number.quantize(Decimal('1'), rounding=ROUND_DOWN) == 0:
+      return 0
+    elif dot_position == -1:
+      return len(number_str)
+    else:
+      return dot_position
+
+  if integer_part(res) >= 7:
+    while integer_part(res) > 8:
+      res /= 10
+      exponent += 1
+      
+    if integer_part(res) == 8:
+      res = res.quantize(Decimal('1'), rounding=ROUND_DOWN)
+      res /= 10
+      exponent += 1
+
+    res = res.quantize(Decimal('1'), rounding=ROUND_HALF_EVEN)
+
+    while exponent:
+      res *= 10
+      exponent -= 1
+  else:
+    exponent = integer_part(res)
+
+    while (integer_part(res) != 8):
+      res *= 10
+
+    res = res.quantize(Decimal('1'), rounding=ROUND_DOWN)
+    res /= 10
+    res = res.quantize(Decimal('1'), rounding=ROUND_HALF_EVEN)
+
+    while integer_part(res) != exponent:
+      res /= 10
+
+  hex_res, code = decimal_to_hex_string(res, "result")
+
+  print("// ", func, "(", num, ") = ", res, sep="")
+  print("  float value = ", num)
+  print(hex_res)
+  print("  int error_code = ", code, ";", sep="")
+
+
+# Round operations ("round", "floor", "truncate", "negate").
+def round_operations(func):
+  getcontext().prec = 29
+
+  num = Decimal(sys.argv[1])
+  res = 0
+
+  if func == "round":
+    res = num.quantize(Decimal('1'), rounding=ROUND_HALF_EVEN)
+  elif func == "floor":
+    res = num.quantize(Decimal('1'), rounding=ROUND_FLOOR)
+  elif func == "truncate":
+    res = num.quantize(Decimal('1'), rounding=ROUND_DOWN)
+  elif func == "negate":
+    res = num * (-1)
+
+  hex_res, code = decimal_to_hex_string(res, "result")
+  hex = decimal_to_hex_string(num, "value")
+
+  print("// ", func, "(", num, ") = ", res, sep="")
+  print(hex)
+  print(hex_res)
+  print("  int error_code = ", code, ";", sep="")
+
+# Arithmetic & comparisons (common function for call).
 def binary_operations(func):
+  getcontext().prec = 60
+
   num1 = Decimal(sys.argv[1])
   num2 = Decimal(sys.argv[3])
   res = 0
-  arithmetic = 0
+  math = 0
 
   if func == "+":
     res = num1 + num2
-    arithmetic = 1
+    math = 1
   elif func == "-":
     res = num1 - num2
-    arithmetic = 1
+    math = 1
   elif func == "*":
     res = num1 * num2
-    arithmetic = 1
+    math = 1
   elif func == "/":
     res = num1 / num2
-    arithmetic = 1
+    math = 1
   elif func == "%":
     res = num1 % num2
-    arithmetic = 1
+    math = 1
 
-  if arithmetic:
-    calculate(num1, num2, res, func)
+  if math:
+    arithmetic(num1, num2, res, func)
   else: 
-    compare(num1, num2, func)
+    comparison(num1, num2, func)
 
-def compare(num1, num2, func):
-  hex1 = decimal_to_hex_string(num1, "value_1")
-  hex2 = decimal_to_hex_string(num2, "value_2")
+# Comparisons ("==", "!=", "<", "<=", ">", ">=").
+def comparison(num1, num2, func):
+  getcontext().prec = 28
 
   code = 0
-
-  num1 = num1.quantize(Decimal('1e-28'), rounding=ROUND_DOWN)
-  num2 = num2.quantize(Decimal('1e-28'), rounding=ROUND_DOWN)
 
   if func == "==":
     code = num1 == num2
@@ -52,13 +135,17 @@ def compare(num1, num2, func):
   elif func == ">=":
     code = num1 >= num2
 
+  hex1 = decimal_to_hex_string(num1, "value_1")
+  hex2 = decimal_to_hex_string(num2, "value_2")
+
   print("//", num1, func, num2, "=", code)
   code *= 1
   print(hex1)
   print(hex2)
   print("  int error_code = ", code, ";", sep="")
 
-def calculate(num1, num2, res, func):
+# Arithmetic ("+", "-", "*", "/", "%").
+def arithmetic(num1, num2, res, func):
   hex1 = decimal_to_hex_string(num1, "value_1")
   hex2 = decimal_to_hex_string(num2, "value_2")
   hex_res, code = decimal_to_hex_string(res, "result")
@@ -69,6 +156,7 @@ def calculate(num1, num2, res, func):
   print(hex_res)
   print("  int error_code = ", code, ";", sep="")
 
+# Converting from py_decimal to structural view of hex massive.
 def decimal_to_hex_string(decimal_value, val):
   exponent = 0
   is_negative = decimal_value < 0
@@ -119,5 +207,20 @@ def decimal_to_hex_string(decimal_value, val):
   else:
     return formatted_string
 
-func = sys.argv[2]
-binary_operations(func)
+# Main function to define test type.
+def main():
+  argc = len(sys.argv) - 1
+
+  if argc == 2:
+    func = sys.argv[2]
+    if func == "round" or func == "floor" or func == "truncate" or func == "negate":
+      round_operations(func)
+    else:
+      # float_to_decimal(func)
+      int_to_decimal(func)
+  elif argc == 3:
+    func = sys.argv[2]
+    binary_operations(func)
+
+# Start script.
+main()
