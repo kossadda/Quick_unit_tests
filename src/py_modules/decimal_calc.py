@@ -1,16 +1,63 @@
 import sys
+import numpy as np
 from decimal import Decimal, getcontext, ROUND_DOWN, ROUND_HALF_EVEN, ROUND_FLOOR
 
-def int_to_decimal(func):
-  getcontext().prec = 28
-
+# Convert operation "decimal_to_float".
+def decimal_to_float(func):
   num = Decimal(sys.argv[1])
-  res = num
+  res = 0.0
+  code = 0
 
-# Convertation operations ("from_int_to_decimal", "from_decimal_to_int", "from_float_to_decimal", "from_decimal_to_float")
+  hex_num = decimal_to_hex_string(num, "value")
+  res = np.float32(num)
+  res = '{:.6f}'.format(res)
+
+  print("// ", func, "(", num, ") = ", res, sep="")
+  print(hex_num)
+  print("  int res =", res)
+  print("  int error_code = ", code, ";", sep="")
+
+# Convert operation "decimal_to_int".
+def decimal_to_int(func):
+  num = Decimal(sys.argv[1])
+  res = 0
+  code = 0
+  temp = 0
+
+  hex_num = decimal_to_hex_string(num, "value")
+  num = num.quantize(Decimal('1'), rounding=ROUND_DOWN)
+  
+  if num > 2147483647 or num < -2147483648:
+    code = 1
+  else:
+    res = num
+
+  print("// ", func, "(", sys.argv[1], ") = ", res, sep="")
+  print(hex_num)
+  print("  int result = ", res)
+  print("  int error_code = ", code, ";", sep="")
+
+# Convert "int_to_decimal".
+def int_to_decimal(func):
+  num = Decimal(sys.argv[1])
+  res = 0
+  code = 0
+  temp = 0
+
+  if num > 2147483647 or num < -2147483648:
+    code = 1
+    hex_res = "  s21_decimal result = {{0x0, 0x0, 0x0, 0x0}};"
+  else:
+    res = num
+    hex_res, temp = decimal_to_hex_string(res, "result")
+
+  print("// ", func, "(", num, ") = ", res, sep="")
+  print("  int value = ", num)
+  print(hex_res)
+  print("  int error_code = ", code, ";", sep="")
+
+# Convert operation "float_to_decimal".
 def float_to_decimal(func):
-  getcontext().prec = 28
-
   num = Decimal(sys.argv[1])
   res = num
   exponent = 0
@@ -113,8 +160,9 @@ def binary_operations(func):
 
   if math:
     arithmetic(num1, num2, res, func)
-  else: 
-    comparison(num1, num2, func)
+  else:
+    if func == "==" or func == "!=" or func == "<" or func == "<=" or func == ">" or func == ">=":
+      comparison(num1, num2, func)
 
 # Comparisons ("==", "!=", "<", "<=", ">", ">=").
 def comparison(num1, num2, func):
@@ -216,8 +264,16 @@ def main():
     if func == "round" or func == "floor" or func == "truncate" or func == "negate":
       round_operations(func)
     else:
-      # float_to_decimal(func)
-      int_to_decimal(func)
+      getcontext().prec = 29
+
+      if func == "float_to_decimal":
+        float_to_decimal(func)
+      elif func == "int_to_decimal":
+        int_to_decimal(func)
+      elif func == "decimal_to_int":
+        decimal_to_int(func)
+      elif func == "decimal_to_float":
+        decimal_to_float(func)
   elif argc == 3:
     func = sys.argv[2]
     binary_operations(func)

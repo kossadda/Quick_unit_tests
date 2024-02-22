@@ -1,5 +1,4 @@
-install:
-	rm -rf ./build ./dist ./*.spec
+install: clean
 	pyinstaller ./py_modules/decimal_calc.py
 	clear
 
@@ -12,3 +11,4 @@ dir:
 clean:
 	@rm -rf result
 	@rm -f test
+	@rm -rf ./build ./dist ./*.spec
