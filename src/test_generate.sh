@@ -2,6 +2,26 @@
 
 source ./generate_number.sh
 
+complex_generate_for_tests()
+{
+  if [[ ${TEST_TYPE} == "binary" ]]; then
+    for ((i = ${TEST_BEGIN}; i < ((${NUMBER_OF_TESTS} + ${TEST_BEGIN})); i++)); do
+      generate_binary_test "${i}"
+    done
+  else
+    for ((i = ${TEST_BEGIN}; i < ((${NUMBER_OF_TESTS} + ${TEST_BEGIN})); i++)); do
+      generate_non_binary_test "${i}"
+    done
+  fi
+
+  echo "#############################################################################"
+  echo "#############################################################################"
+  echo "#############################################################################"
+
+  generate_suite
+  generate_header >> module.h
+}
+
 generate_binary_test()
 {
   echo "START_TEST(${FUNCTION}_${1})"
@@ -43,42 +63,58 @@ generate_case()
   echo " */"
   echo "Suite *${FUNCTION}_case_${CASE_NUMBER}(void)"
   echo "{"
-  echo "    Suite *${SUITE_NAME} = suite_create(\"\\n${PROJECT_NAME} (${FUNCTION} case №${CASE_NUMBER})\\n\");"
+  echo "  Suite *${SUITE_NAME} = suite_create(\"\\n${PROJECT_NAME} (${FUNCTION} case №${CASE_NUMBER})\\n\");"
 
   echo
-  echo "    TCase *tc_${FUNCTION} = tcase_create(\"${FUNCTION}_test\");"
+  echo "  TCase *tc_${FUNCTION} = tcase_create(\"${FUNCTION}_test\");"
 }
 
 generate_tcase()
 {
-  echo "    tcase_add_test(tc_${FUNCTION}, ${FUNCTION}_${1});"
+  echo "  tcase_add_test(tc_${FUNCTION}, ${FUNCTION}_${1});"
 }
 
 generate_end()
 {
-  echo "    suite_add_tcase(${SUITE_NAME}, tc_${FUNCTION});"
+  echo "  suite_add_tcase(${SUITE_NAME}, tc_${FUNCTION});"
   echo
-  echo "    return ${SUITE_NAME};"
+  echo "  return ${SUITE_NAME};"
   echo "}"
 }
 
-generate_list_for_header()
+generate_suite()
 {
-  echo "Suite *s21_${FUNCTION}_${CASE_NUMBER[$1]}_case(void);"
+  local count=${TEST_BEGIN}
+  i=0
+
+  for ((i = BEGIN_CASE; end_count != TEST_END; i++)); do
+    generate_case ${i}
+    end_count=$((count + TESTS_IN_CASE - 1))
+
+    if ((end_count > TEST_END)); then
+      end_count=${TEST_END}
+    fi
+
+    for ((j = count; j <= end_count; j++)); do
+      generate_tcase "${j}"
+    done
+
+    count=$((end_count + 1))
+    generate_end
+  done
 }
 
-generate_array_start()
+generate_header()
 {
-  echo "Suite *(*s21_${FUNCTION}[])(void) = {"
-}
+  for ((j = BEGIN_CASE; j < i; j++)); do
+    echo "Suite *${FUNCTION}_case_${j}(void);"
+  done
+  
+  echo
 
-generate_array_end()
-{
+  echo "Suite *(*${FUNCTION}[])(void) = {"
+  for ((j = BEGIN_CASE; j < i; j++)); do
+    echo "  ${FUNCTION}_${j}_case,"
+  done
   echo "};"
 }
-
-generate_array()
-{
-  echo "    s21_${FUNCTION}_${CASE_NUMBER[$1]}_case,"
-}
-

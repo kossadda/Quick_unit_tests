@@ -60,46 +60,26 @@ def int_to_decimal(func):
 def float_to_decimal(func):
   num = Decimal(sys.argv[1])
   res = num
-  exponent = 0
+  integer_part = len(str(abs(num)).split('.')[0])
 
-  def integer_part(decimal_number):
-    number_str = str(abs(decimal_number))
-    dot_position = number_str.find('.')
+  if abs(res) < 1:
+    res = res.normalize()
+    res = res.quantize(Decimal('1e-{}'.format(8)), rounding=ROUND_DOWN)
+    res = res.quantize(Decimal('1e-{}'.format(7)), rounding=ROUND_HALF_EVEN)
+  elif integer_part >= 8:
+    sign = 1
     
-    if decimal_number.quantize(Decimal('1'), rounding=ROUND_DOWN) == 0:
-      return 0
-    elif dot_position == -1:
-      return len(number_str)
-    else:
-      return dot_position
-
-  if integer_part(res) >= 7:
-    while integer_part(res) > 8:
-      res /= 10
-      exponent += 1
-      
-    if integer_part(res) == 8:
-      res = res.quantize(Decimal('1'), rounding=ROUND_DOWN)
-      res /= 10
-      exponent += 1
-
-    res = res.quantize(Decimal('1'), rounding=ROUND_HALF_EVEN)
-
-    while exponent:
-      res *= 10
-      exponent -= 1
+    if res < 0:
+      sign = -1
+    
+    str_res = str(abs(res))
+    str_res = str_res[:8]
+    res = Decimal(str_res) / 10
+    res = res.quantize(Decimal('1e-{}'.format(0)), rounding=ROUND_HALF_EVEN)
   else:
-    exponent = integer_part(res)
-
-    while (integer_part(res) != 8):
-      res *= 10
-
-    res = res.quantize(Decimal('1'), rounding=ROUND_DOWN)
-    res /= 10
-    res = res.quantize(Decimal('1'), rounding=ROUND_HALF_EVEN)
-
-    while integer_part(res) != exponent:
-      res /= 10
+    res = res.normalize()
+    res = res.quantize(Decimal('1e-{}'.format(8 - integer_part)), rounding=ROUND_DOWN)
+    res = res.quantize(Decimal('1e-{}'.format(7 - integer_part)), rounding=ROUND_HALF_EVEN)
 
   hex_res, code = decimal_to_hex_string(res, "result")
 
@@ -219,6 +199,9 @@ def decimal_to_hex_string(decimal_value, val):
   while not (decimal_value == decimal_value.to_integral_value()):
     decimal_value *= 10
     exponent += 1
+    if exponent >= 28:
+      decimal_value = decimal_value.quantize(Decimal('1'), rounding=ROUND_HALF_EVEN)
+      break
     
   num_binary = bin(int(decimal_value))[2:]
     
