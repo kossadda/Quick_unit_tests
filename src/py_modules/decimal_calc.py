@@ -12,10 +12,10 @@ def decimal_to_float(func):
   res = np.float32(num)
   res = '{:.6f}'.format(res)
 
-  print("// ", func, "(", num, ") = ", res, sep="")
+  print("  char *example = \"", func, "(", num, ") = ", res, "\";", sep="")
   print(hex_num)
   print("  float result = ", res, ";", sep="")
-  print("  int error_code = ", code, ";", sep="")
+  print("  int code = ", code, ";", sep="")
 
 # Convert operation "decimal_to_int".
 def decimal_to_int(func):
@@ -32,10 +32,10 @@ def decimal_to_int(func):
   else:
     res = num
 
-  print("// ", func, "(", sys.argv[1], ") = ", res, sep="")
+  print("  char *example = \"", func, "(", sys.argv[1], ") = ", res, "\";", sep="")
   print(hex_num)
   print("  int result = ", res, ";", sep="")
-  print("  int error_code = ", code, ";", sep="")
+  print("  int code = ", code, ";", sep="")
 
 # Convert "int_to_decimal".
 def int_to_decimal(func):
@@ -51,10 +51,10 @@ def int_to_decimal(func):
     res = num
     hex_res, temp = decimal_to_hex_string(res, "result")
 
-  print("// ", func, "(", num, ") = ", res, sep="")
+  print("  char *example = \"", func, "(", num, ") = ", res, "\";", sep="")
   print("  int value = ", num, ";", sep="")
   print(hex_res)
-  print("  int error_code = ", code, ";", sep="")
+  print("  int code = ", code, ";", sep="")
 
 # Convert operation "float_to_decimal".
 def float_to_decimal(func):
@@ -83,10 +83,10 @@ def float_to_decimal(func):
 
   hex_res, code = decimal_to_hex_string(res, "result")
 
-  print("// ", func, "(", num, ") = ", res, sep="")
+  print("  char *example = \"", func, "(", num, ") = ", res, "\";", sep="")
   print("  float value = ", num, ";", sep="")
   print(hex_res)
-  print("  int error_code = ", code, ";", sep="")
+  print("  int code = ", code, ";", sep="")
 
 # Round operations ("round", "floor", "truncate", "negate").
 def round_operations(func):
@@ -107,10 +107,10 @@ def round_operations(func):
   hex_res, code = decimal_to_hex_string(res, "result")
   hex = decimal_to_hex_string(num, "value")
 
-  print("// ", func, "(", num, ") = ", res, sep="")
+  print("  char *example = \"", func, "(", num, ") = ", res, "\";", sep="")
   print(hex)
   print(hex_res)
-  print("  int error_code = ", code, ";", sep="")
+  print("  int code = ", code, ";", sep="")
 
 # Arithmetic & comparisons (common function for call).
 def binary_operations(func):
@@ -165,11 +165,11 @@ def comparison(num1, num2, func):
   hex1 = decimal_to_hex_string(num1, "value_1")
   hex2 = decimal_to_hex_string(num2, "value_2")
 
-  print("// (", num1, func, num2, ") =", code)
+  print("  char *example = \"( ", num1, " ", func, " ", num2, " ) = ", code, "\";", sep="")
   code *= 1
   print(hex1)
   print(hex2)
-  print("  int error_code = ", code, ";", sep="")
+  print("  int code = ", code, ";", sep="")
 
 # Arithmetic ("+", "-", "*", "/", "%").
 def arithmetic(num1, num2, res, func):
@@ -177,11 +177,11 @@ def arithmetic(num1, num2, res, func):
   hex2 = decimal_to_hex_string(num2, "value_2")
   hex_res, code = decimal_to_hex_string(res, "result")
 
-  print("//", num1, func, num2, "=", res)
+  print("  char *example = \"", num1, " ", func, " ", num2, " = ", res, "\";", sep="")
   print(hex1)
   print(hex2)
   print(hex_res)
-  print("  int error_code = ", code, ";", sep="")
+  print("  int code = ", code, ";", sep="")
 
 # Converting from py_decimal to structural view of hex massive.
 def decimal_to_hex_string(decimal_value, val):

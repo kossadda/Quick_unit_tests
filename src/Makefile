@@ -1,15 +1,13 @@
+run:
+	@./bash_modules/main
+
 install: clean
 	pyinstaller ./py_modules/decimal_calc.py
+	@rm -rf ./build ./*.spec
 	clear
-
-run: clean dir
-	@./main
-
-dir:
-	@mkdir result
 
 clean:
 	@rm -rf result
-	@rm -f test
-	@rm -rf ./build ./dist ./*.spec
-	@rm -f module.*
+
+clean_all: clean
+	@rm -rf ./dist

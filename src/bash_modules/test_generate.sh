@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./generate_number.sh
+source ./bash_modules/generate_number.sh
 
 complex_generate_for_tests()
 {
@@ -14,21 +14,21 @@ complex_generate_for_tests()
     done
   fi
 
-  echo "#############################################################################"
-  echo "#############################################################################"
-  echo "#############################################################################"
+  echo "//#####################################################################"
+  echo "//#####################################################################"
+  echo "//#####################################################################"
 
   generate_suite
-  generate_header >> module.h
+  generate_header >> ${RESULT_DIR}/module.h
 }
 
 generate_binary_test()
 {
-  echo "START_TEST(${FUNCTION}_${1})"
-  echo "{"
+  echo "START_TEST(${FUNCTION}_${1}) {"
   ./dist/decimal_calc/decimal_calc $(generate_float_decimal) "${OPERATION}" $(generate_float_decimal)
+  echo "  int count = ${1};"
   echo
-  echo "  ${TEST_FUNCTION}(value_1, value_2, result, code);"
+  echo "  ${TEST_FUNCTION}(value_1, value_2, result, code, example, count);"
   echo "}"
   echo
 }
@@ -43,11 +43,11 @@ generate_non_binary_test()
     value=$(generate_float_decimal)
   fi
 
-  echo "START_TEST(${FUNCTION}_${1})"
-  echo "{"
+  echo "START_TEST(${FUNCTION}_${1}) {"
   ./dist/decimal_calc/decimal_calc ${value} "${OPERATION}"
+  echo "  int count = ${1};"
   echo
-  echo "  ${TEST_FUNCTION}(value_1, result, code);"
+  echo "  ${TEST_FUNCTION}(value, result, code, example, count);"
   echo "}"
   echo
 }
@@ -112,9 +112,9 @@ generate_header()
   
   echo
 
-  echo "Suite *(*${FUNCTION}[])(void) = {"
+  echo "  Suite *(*${FUNCTION}_cases[])(void) = {"
   for ((j = BEGIN_CASE; j < i; j++)); do
-    echo "  ${FUNCTION}_${j}_case,"
+    echo "    ${FUNCTION}_case_${j},"
   done
-  echo "};"
+  echo "  };"
 }

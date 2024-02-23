@@ -1,0 +1,19 @@
+#!/bin/bash
+
+main()
+{
+  if ! [[ -d "dist" ]]; then
+    make install
+  fi
+
+  source ./configuration.conf
+  source ./bash_modules/test_generate.sh
+
+  rm -rf ${RESULT_DIR}
+  mkdir -p ${RESULT_DIR}
+
+  complex_generate_for_tests >> ${RESULT_DIR}/module.c
+}
+main
+
+
