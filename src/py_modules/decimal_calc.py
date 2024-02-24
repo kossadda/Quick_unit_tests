@@ -114,7 +114,7 @@ def round_operations(func):
 
 # Arithmetic & comparisons (common function for call).
 def binary_operations(func):
-  getcontext().prec = 29
+  getcontext().prec = 31
 
   num1 = Decimal(sys.argv[1])
   num2 = Decimal(sys.argv[3])
@@ -131,7 +131,8 @@ def binary_operations(func):
     res = num1 * num2
     math = 1
   elif func == "/":
-    res = num1 / num2
+    if num2 != 0:
+      res = num1 / num2
     math = 1
   elif func == "%":
     res = num1 % num2
@@ -175,7 +176,11 @@ def comparison(num1, num2, func):
 def arithmetic(num1, num2, res, func):
   hex1 = decimal_to_hex_string(num1, "value_1")
   hex2 = decimal_to_hex_string(num2, "value_2")
-  hex_res, code = decimal_to_hex_string(res, "result")
+  if num2 == 0 and func == "/":
+    hex_res = "  s21_decimal result = {{0x0, 0x0, 0x0, 0x0}};"
+    code = 3
+  else:
+    hex_res, code = decimal_to_hex_string(res, "result")
 
   print("  char *example = \"", num1, " ", func, " ", num2, " = ", res, "\";", sep="")
   print(hex1)
@@ -196,12 +201,10 @@ def decimal_to_hex_string(decimal_value, val):
     else:
       return "  s21_decimal result = {{0x0, 0x0, 0x0, 0x0}};", "1"
 
+
   while not (decimal_value == decimal_value.to_integral_value()):
     decimal_value *= 10
     exponent += 1
-    if exponent >= 28:
-      decimal_value = decimal_value.quantize(Decimal('1'), rounding=ROUND_HALF_EVEN)
-      break
     
   num_binary = bin(int(decimal_value))[2:]
     
@@ -209,6 +212,11 @@ def decimal_to_hex_string(decimal_value, val):
     decimal_value /= 10
     exponent -= 1
     num_binary = bin(int(decimal_value))[2:]
+    if len(num_binary) > 96:
+      decimal_value = decimal_value.quantize(Decimal('1'), rounding=ROUND_DOWN)
+    if len(num_binary) <= 96:
+      decimal_value = decimal_value.quantize(Decimal('1'), rounding=ROUND_HALF_EVEN)
+      num_binary = bin(int(decimal_value))[2:]
 
   padded_binary = num_binary.zfill(((len(num_binary) + 31) // 32) * 32)
 

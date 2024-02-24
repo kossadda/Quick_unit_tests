@@ -12,7 +12,7 @@ main()
   rm -rf ${RESULT_DIR}
   mkdir -p ${RESULT_DIR}
 
-  complex_generate_for_tests >> ${RESULT_DIR}/module.c
+  complex_generate_for_tests >> ${RESULT_DIR}/tests.c
 }
 main
 

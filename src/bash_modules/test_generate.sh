@@ -18,8 +18,8 @@ complex_generate_for_tests()
   echo "//#####################################################################"
   echo "//#####################################################################"
 
-  generate_suite
-  generate_header >> ${RESULT_DIR}/module.h
+  generate_suite >> ${RESULT_DIR}/suites.c
+  generate_header >> ${RESULT_DIR}/declarations.h
 }
 
 generate_binary_test()
