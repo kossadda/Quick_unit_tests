@@ -11,3 +11,8 @@ install: clean
 
 uninstall: clean
 	@rm -rf ./dist
+
+dependencies:
+	install pyton3-pip
+	pip install pyinstaller
+	pip install numpy

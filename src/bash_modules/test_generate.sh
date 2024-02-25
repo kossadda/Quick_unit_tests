@@ -18,16 +18,19 @@ complex_generate_for_tests()
   echo
 
   if [[ ${TEST_TYPE} == "binary" ]]; then
-    for ((i = ${TEST_BEGIN}; i < ((${NUMBER_OF_TESTS} + ${TEST_BEGIN})); i++)); do
-      echo -ne "\rIn progress... Generating test № ${YELLOW}${i}${RESET}."
+    for ((i = TEST_BEGIN; i < NUMBER_OF_TESTS + TEST_BEGIN; i++)); do
+      percent=$(((i - TEST_BEGIN) * 100 / NUMBER_OF_TESTS))
+      echo -ne "\rIn progress... Generating test № ${YELLOW}${i}${RESET} (${YELLOW}${percent}%${RESET})."
       (generate_binary_test "${i}") >> ${RESULT_DIR}/tests.c
     done
   else
-    for ((i = ${TEST_BEGIN}; i < ((${NUMBER_OF_TESTS} + ${TEST_BEGIN})); i++)); do
-      echo -ne "\rIn progress... Generating test № ${YELLOW}${i}${RESET}."
+    for ((i = TEST_BEGIN; i < NUMBER_OF_TESTS + TEST_BEGIN; i++)); do
+      percent=$(((i - TEST_BEGIN) * 100 / NUMBER_OF_TESTS))
+      echo -ne "\rIn progress... Generating test № ${YELLOW}${i}${RESET} (${YELLOW}${percent}%${RESET})."
       (generate_non_binary_test "${i}") >> ${RESULT_DIR}/tests.c
     done
   fi
+  echo -ne "\rIn progress... Generating test № ${YELLOW}${TEST_END}${RESET} (${YELLOW}100%${RESET})."
 
   echo "//#####################################################################" >> ${RESULT_DIR}/tests.c
   echo "//#####################################################################" >> ${RESULT_DIR}/tests.c

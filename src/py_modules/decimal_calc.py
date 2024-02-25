@@ -179,7 +179,7 @@ def arithmetic(num1, num2, res, func):
   if num2 == 0 and func == "/":
     hex_res = "  s21_decimal result = {{0x0, 0x0, 0x0, 0x0}};"
     code = 3
-  elif num1 != 0 and res < 1e-28:
+  elif num1 != 0 and abs(res) < 1e-28:
     res.quantize(Decimal('1e-{}'.format(28)), rounding=ROUND_HALF_EVEN)
     if res == 0:
       hex_res = "  s21_decimal result = {{0x0, 0x0, 0x0, 0x1C0000}};"
