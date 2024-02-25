@@ -2,6 +2,8 @@
 
 main()
 {
+  start_time=$(date +%s)
+
   if ! [[ -d "dist" ]]; then
     make install
   fi
@@ -12,7 +14,16 @@ main()
   rm -rf ${RESULT_DIR}
   mkdir -p ${RESULT_DIR}
 
-  complex_generate_for_tests >> ${RESULT_DIR}/tests.c
+  complex_generate_for_tests
+
+  end_time=$(date +%s)
+
+  execute_time=$((end_time - start_time))
+
+  echo -e "${GREEN}COMPLETED!${RESET}"
+  echo
+  echo -e "Generated ${YELLOW}${NUMBER_OF_TESTS}${RESET} tests at ${YELLOW}${execute_time}${RESET} seconds. You can find tests in ${YELLOW}src/${RESULT_DIR}${RESET}."
+  echo
 }
 main
 

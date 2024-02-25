@@ -114,7 +114,7 @@ def round_operations(func):
 
 # Arithmetic & comparisons (common function for call).
 def binary_operations(func):
-  getcontext().prec = 31
+  getcontext().prec = 60
 
   num1 = Decimal(sys.argv[1])
   num2 = Decimal(sys.argv[3])
@@ -212,8 +212,8 @@ def decimal_to_hex_string(decimal_value, val):
     decimal_value /= 10
     exponent -= 1
     num_binary = bin(int(decimal_value))[2:]
-    if len(num_binary) > 96:
-      decimal_value = decimal_value.quantize(Decimal('1'), rounding=ROUND_DOWN)
+    #if len(num_binary) > 96:
+      #decimal_value = decimal_value.quantize(Decimal('1'), rounding=ROUND_DOWN)
     if len(num_binary) <= 96:
       decimal_value = decimal_value.quantize(Decimal('1'), rounding=ROUND_HALF_EVEN)
       num_binary = bin(int(decimal_value))[2:]

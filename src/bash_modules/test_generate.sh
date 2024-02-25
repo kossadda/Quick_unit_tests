@@ -4,22 +4,38 @@ source ./bash_modules/generate_number.sh
 
 complex_generate_for_tests()
 {
+  clear
+  echo -e "${YELLOW}ENTERED PARAMETERS:${RESET}"
+  echo
+  echo "Project name: ${PROJECT_NAME}."
+  echo "Function name: ${FUNCTION}."
+  echo "Number of tests: ${NUMBER_OF_TESTS}."
+  echo "Numer of tests in one case: ${TESTS_IN_CASE}."
+  echo
+  echo -e "${YELLOW}START GENERATING:${RESET}"
+  echo
+
   if [[ ${TEST_TYPE} == "binary" ]]; then
     for ((i = ${TEST_BEGIN}; i < ((${NUMBER_OF_TESTS} + ${TEST_BEGIN})); i++)); do
-      generate_binary_test "${i}"
+      (generate_binary_test "${i}") >> ${RESULT_DIR}/tests.c
+      echo -ne "\rIn progress... Generated ${YELLOW}${i}${RESET} tests."
     done
   else
     for ((i = ${TEST_BEGIN}; i < ((${NUMBER_OF_TESTS} + ${TEST_BEGIN})); i++)); do
-      generate_non_binary_test "${i}"
+      (generate_non_binary_test "${i}") >> ${RESULT_DIR}/tests.c
+      echo -ne "\rIn progress... Generated ${YELLOW}${i}${RESET} tests."
     done
   fi
 
-  echo "//#####################################################################"
-  echo "//#####################################################################"
-  echo "//#####################################################################"
+  echo "//#####################################################################" >> ${RESULT_DIR}/tests.c
+  echo "//#####################################################################" >> ${RESULT_DIR}/tests.c
+  echo "//#####################################################################" >> ${RESULT_DIR}/tests.c
 
   generate_suite >> ${RESULT_DIR}/suites.c
   generate_header >> ${RESULT_DIR}/declarations.h
+
+  echo
+  echo
 }
 
 generate_binary_test()
@@ -44,7 +60,7 @@ generate_non_binary_test()
   fi
 
   echo "START_TEST(${FUNCTION}_${1}) {"
-  ./dist/decimal_calc/decimal_calc ${value} "${OPERATION}"
+  ./dist/decimal_calc/decimal_calc "${value}" "${OPERATION}"
   echo "  int count = ${1};"
   echo
   echo "  ${TEST_FUNCTION}(value, result, code, example, count);"
