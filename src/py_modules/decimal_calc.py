@@ -179,6 +179,13 @@ def arithmetic(num1, num2, res, func):
   if num2 == 0 and func == "/":
     hex_res = "  s21_decimal result = {{0x0, 0x0, 0x0, 0x0}};"
     code = 3
+  elif num1 != 0 and res < 1e-28:
+    res.quantize(Decimal('1e-{}'.format(28)), rounding=ROUND_HALF_EVEN)
+    if res == 0:
+      hex_res = "  s21_decimal result = {{0x0, 0x0, 0x0, 0x1C0000}};"
+      code = 2
+    else:
+      hex_res, code = decimal_to_hex_string(res, "result")
   else:
     hex_res, code = decimal_to_hex_string(res, "result")
 
@@ -201,22 +208,22 @@ def decimal_to_hex_string(decimal_value, val):
     else:
       return "  s21_decimal result = {{0x0, 0x0, 0x0, 0x0}};", "1"
 
-
   while not (decimal_value == decimal_value.to_integral_value()):
     decimal_value *= 10
     exponent += 1
     
   num_binary = bin(int(decimal_value))[2:]
     
-  while len(num_binary) > 96:
+  while len(num_binary) > 96 or exponent >= 28:
     decimal_value /= 10
     exponent -= 1
     num_binary = bin(int(decimal_value))[2:]
     #if len(num_binary) > 96:
       #decimal_value = decimal_value.quantize(Decimal('1'), rounding=ROUND_DOWN)
-    if len(num_binary) <= 96:
+    if len(num_binary) <= 96 and exponent <= 28:
       decimal_value = decimal_value.quantize(Decimal('1'), rounding=ROUND_HALF_EVEN)
       num_binary = bin(int(decimal_value))[2:]
+      break
 
   padded_binary = num_binary.zfill(((len(num_binary) + 31) // 32) * 32)
 

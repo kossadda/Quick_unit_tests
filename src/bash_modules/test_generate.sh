@@ -10,6 +10,8 @@ complex_generate_for_tests()
   echo "Project name: ${PROJECT_NAME}."
   echo "Function name: ${FUNCTION}."
   echo "Number of tests: ${NUMBER_OF_TESTS}."
+  echo "First test number: ${TEST_BEGIN}."
+  echo "Last test number: ${TEST_END}."
   echo "Numer of tests in one case: ${TESTS_IN_CASE}."
   echo
   echo -e "${YELLOW}START GENERATING:${RESET}"
@@ -17,13 +19,13 @@ complex_generate_for_tests()
 
   if [[ ${TEST_TYPE} == "binary" ]]; then
     for ((i = ${TEST_BEGIN}; i < ((${NUMBER_OF_TESTS} + ${TEST_BEGIN})); i++)); do
+      echo -ne "\rIn progress... Generating test № ${YELLOW}${i}${RESET}."
       (generate_binary_test "${i}") >> ${RESULT_DIR}/tests.c
-      echo -ne "\rIn progress... Generated ${YELLOW}${i}${RESET} tests."
     done
   else
     for ((i = ${TEST_BEGIN}; i < ((${NUMBER_OF_TESTS} + ${TEST_BEGIN})); i++)); do
+      echo -ne "\rIn progress... Generating test № ${YELLOW}${i}${RESET}."
       (generate_non_binary_test "${i}") >> ${RESULT_DIR}/tests.c
-      echo -ne "\rIn progress... Generated ${YELLOW}${i}${RESET} tests."
     done
   fi
 
