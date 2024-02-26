@@ -4,18 +4,24 @@ source ./bash_modules/generate_number.sh
 
 complex_generate_for_tests()
 {
-  clear
-  echo -e "${YELLOW}ENTERED PARAMETERS:${RESET}"
-  echo
-  echo "Project name: ${PROJECT_NAME}."
-  echo "Function name: ${FUNCTION}."
-  echo "Number of tests: ${NUMBER_OF_TESTS}."
-  echo "First test number: ${TEST_BEGIN}."
-  echo "Last test number: ${TEST_END}."
-  echo "Numer of tests in one case: ${TESTS_IN_CASE}."
-  echo
-  echo -e "${YELLOW}START GENERATING:${RESET}"
-  echo
+  echo -e "${YELLOW}"
+  echo " __________________________________________________________________"
+  echo "|                                                                  |"
+  echo "|                        ENTERED PARAMETERS:                       |"
+  echo "|__________________________________________________________________|"
+  echo -e "${RESET}"
+  echo -e "${BOLD}Project name${RESET}: ${PROJECT_NAME}."
+  echo -e "${BOLD}Function name${RESET}: ${FUNCTION}."
+  echo -e "${BOLD}Number of tests${RESET}: ${NUMBER_OF_TESTS}."
+  echo -e "${BOLD}First test number${RESET}: ${TEST_BEGIN}."
+  echo -e "${BOLD}Last test number${RESET}: ${TEST_END}."
+  echo -e "${BOLD}Numer of tests in one case${RESET}: ${TESTS_IN_CASE}."
+  echo -e "${YELLOW}"
+  echo " __________________________________________________________________"
+  echo "|                                                                  |"
+  echo "|                         START GENERATING:                        |"
+  echo "|__________________________________________________________________|"
+  echo -e "${RESET}"
 
   if [[ ${TEST_TYPE} == "binary" ]]; then
     for ((i = TEST_BEGIN; i < NUMBER_OF_TESTS + TEST_BEGIN; i++)); do
@@ -39,7 +45,6 @@ complex_generate_for_tests()
   generate_suite >> ${RESULT_DIR}/suites.c
   generate_header >> ${RESULT_DIR}/declarations.h
 
-  echo
   echo
 }
 

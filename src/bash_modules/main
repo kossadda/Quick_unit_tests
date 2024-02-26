@@ -6,9 +6,24 @@ main()
 
   if ! [[ -d "dist" ]]; then
     make install
+    clear
   fi
 
   source ./configuration.conf
+
+  if [[ ${OPERATION} == "not_exist" ]]; then
+    echo -e "${YELLOW}"
+    echo " __________________________________________________________________"
+    echo "|                                                                  |"
+    echo "|                             WARNING:                             |"
+    echo "|__________________________________________________________________|"
+    echo -e "${RESET}"
+    echo -e "Function ${YELLOW}${FUNCTION}${RESET} does not exist."
+    echo -e "${RED}Exiting...${RESET}"
+    echo
+    exit
+  fi
+
   source ./bash_modules/test_generate.sh
 
   rm -rf ${RESULT_DIR}
@@ -20,8 +35,12 @@ main()
 
   execute_time=$((end_time - start_time))
 
-  echo -e "${GREEN}COMPLETED!${RESET}"
-  echo
+  echo -e "${YELLOW}"
+  echo " __________________________________________________________________"
+  echo "|                                                                  |"
+  echo "|                              RESULTS:                            |"
+  echo "|__________________________________________________________________|"
+  echo -e "${RESET}"
   echo -e "Generated ${YELLOW}${NUMBER_OF_TESTS}${RESET} tests at ${YELLOW}${execute_time}${RESET} seconds. You can find tests in ${YELLOW}src/${RESULT_DIR}${RESET}."
   echo
 }

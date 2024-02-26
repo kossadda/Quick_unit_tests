@@ -1,6 +1,6 @@
 import sys
 import numpy as np
-from decimal import Decimal, getcontext, ROUND_DOWN, ROUND_HALF_EVEN, ROUND_FLOOR
+from decimal import Decimal, getcontext, ROUND_DOWN, ROUND_HALF_EVEN, ROUND_FLOOR, ROUND_HALF_UP
 
 # Convert operation "decimal_to_float".
 def decimal_to_float(func):
@@ -14,7 +14,10 @@ def decimal_to_float(func):
 
   print("  char *example = \"", func, "(", num, ") = ", res, "\";", sep="")
   print(hex_num)
-  print("  float result = ", res, ";", sep="")
+  if '.' in sys.argv[1]:
+    print("  float result = ", res, ";", sep="")
+  else:
+    print("  float result = ", res, ".0;", sep="")
   print("  int code = ", code, ";", sep="")
 
 # Convert operation "decimal_to_int".
@@ -60,12 +63,22 @@ def int_to_decimal(func):
 def float_to_decimal(func):
   num = Decimal(sys.argv[1])
   res = num
-  integer_part = len(str(abs(num)).split('.')[0])
-
+  exponent = 0
   if abs(res) < 1:
-    res = res.normalize()
-    res = res.quantize(Decimal('1e-{}'.format(8)), rounding=ROUND_DOWN)
-    res = res.quantize(Decimal('1e-{}'.format(7)), rounding=ROUND_HALF_EVEN)
+    integer_part = 0
+  else:
+    integer_part = len(str(abs(res)).split('.')[0])
+  
+  if integer_part == 0:
+    while integer_part != 7 and num != 0:
+      res *= 10
+      exponent += 1
+      if abs(res) < 1:
+        integer_part = 0
+      else:
+        integer_part = len(str(abs(res)).split('.')[0])
+    res = res.quantize(Decimal('1'), rounding=ROUND_HALF_UP)
+    res /= 10 ** exponent
   elif integer_part >= 8:
     sign = 1
     
@@ -74,17 +87,24 @@ def float_to_decimal(func):
     
     str_res = str(abs(res))
     str_res = str_res[:8]
-    res = Decimal(str_res) / 10
+    res = Decimal(str_res) / 10 * sign
     res = res.quantize(Decimal('1e-{}'.format(0)), rounding=ROUND_HALF_EVEN)
+    res *= 10 ** (integer_part - len(str(abs(res)).split('.')[0]))
   else:
     res = res.normalize()
-    res = res.quantize(Decimal('1e-{}'.format(8 - integer_part)), rounding=ROUND_DOWN)
-    res = res.quantize(Decimal('1e-{}'.format(7 - integer_part)), rounding=ROUND_HALF_EVEN)
+    res = res.quantize(Decimal('1e-{}'.format(7 - integer_part)), rounding=ROUND_HALF_UP)
 
   hex_res, code = decimal_to_hex_string(res, "result")
 
+  if abs(num) > 79228162514264337593543950335:
+    hex_res = "  s21_decimal result = {{0x0, 0x0, 0x0, 0x0}};"
+    code = 1
+
   print("  char *example = \"", func, "(", num, ") = ", res, "\";", sep="")
-  print("  float value = ", num, ";", sep="")
+  if '.' in sys.argv[1]:
+    print("  float value = ", num, ";", sep="")
+  else:
+    print("  float value = ", num, ".0;", sep="")
   print(hex_res)
   print("  int code = ", code, ";", sep="")
 
@@ -179,13 +199,17 @@ def arithmetic(num1, num2, res, func):
   if num2 == 0 and func == "/":
     hex_res = "  s21_decimal result = {{0x0, 0x0, 0x0, 0x0}};"
     code = 3
+  elif (num1 == 0 or num2 == 0) and func == "*":
+    hex_res = "  s21_decimal result = {{0x0, 0x0, 0x0, 0x0}};"
+    code = 0
   elif num1 != 0 and abs(res) < 1e-28:
-    res.quantize(Decimal('1e-{}'.format(28)), rounding=ROUND_HALF_EVEN)
+    res = res.quantize(Decimal('1e-{}'.format(28)), rounding=ROUND_HALF_EVEN)
     if res == 0:
       hex_res = "  s21_decimal result = {{0x0, 0x0, 0x0, 0x1C0000}};"
       code = 2
     else:
-      hex_res, code = decimal_to_hex_string(res, "result")
+      hex_res = "  s21_decimal result = {{0x0, 0x0, 0x1, 0x1C0000}};"
+      code = 0
   else:
     hex_res, code = decimal_to_hex_string(res, "result")
 
@@ -214,12 +238,10 @@ def decimal_to_hex_string(decimal_value, val):
     
   num_binary = bin(int(decimal_value))[2:]
     
-  while len(num_binary) > 96 or exponent >= 28:
+  while len(num_binary) > 96 or exponent > 28:
     decimal_value /= 10
     exponent -= 1
     num_binary = bin(int(decimal_value))[2:]
-    #if len(num_binary) > 96:
-      #decimal_value = decimal_value.quantize(Decimal('1'), rounding=ROUND_DOWN)
     if len(num_binary) <= 96 and exponent <= 28:
       decimal_value = decimal_value.quantize(Decimal('1'), rounding=ROUND_HALF_EVEN)
       num_binary = bin(int(decimal_value))[2:]
@@ -255,13 +277,12 @@ def decimal_to_hex_string(decimal_value, val):
 # Main function to define test type.
 def main():
   argc = len(sys.argv) - 1
-
   if argc == 2:
     func = sys.argv[2]
     if func == "round" or func == "floor" or func == "truncate" or func == "negate":
       round_operations(func)
     else:
-      getcontext().prec = 29
+      getcontext().prec = 60
 
       if func == "float_to_decimal":
         float_to_decimal(func)
