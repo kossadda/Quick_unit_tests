@@ -15,7 +15,7 @@ complex_generate_for_tests()
   echo -e "${BOLD}Number of tests${RESET}: ${NUMBER_OF_TESTS}."
   echo -e "${BOLD}First test number${RESET}: ${TEST_BEGIN}."
   echo -e "${BOLD}Last test number${RESET}: ${TEST_END}."
-  echo -e "${BOLD}Numer of tests in one case${RESET}: ${TESTS_IN_CASE}."
+  echo -e "${BOLD}Number of tests in one case${RESET}: ${TESTS_IN_CASE}."
   echo -e "${YELLOW}"
   echo " __________________________________________________________________"
   echo "|                                                                  |"
