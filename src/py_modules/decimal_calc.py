@@ -1,4 +1,5 @@
 import sys
+import random
 import numpy as np
 from decimal import Decimal, getcontext, ROUND_DOWN, ROUND_HALF_EVEN, ROUND_FLOOR, ROUND_HALF_UP
 
@@ -171,6 +172,14 @@ def binary_operations(func):
 # Comparisons ("==", "!=", "<", "<=", ">", ">=").
 def comparison(num1, num2, func):
   getcontext().prec = 28
+  equal = 0
+  if random.random() > 0.9:
+    temp = num1
+    while not (temp == temp.to_integral_value()):
+      temp *= 10
+    if abs(temp) < 1000000000:
+      num2 = num1
+      equal = 1
 
   code = 0
 
@@ -187,8 +196,11 @@ def comparison(num1, num2, func):
   elif func == ">=":
     code = num1 >= num2
 
-  hex1 = decimal_to_hex_string(num1, "value_1")
-  hex2 = decimal_to_hex_string(num2, "value_2")
+  if equal == 0:
+    hex1 = decimal_to_hex_string(num1, "value_1")
+    hex2 = decimal_to_hex_string(num2, "value_2")
+  else:
+    hex1, hex2 = decimal_to_equal_string(num1)
 
   print("  char *example = \"( ", num1, " ", func, " ", num2, " ) = ", code, "\";", sep="")
   code *= 1
@@ -215,13 +227,69 @@ def arithmetic(num1, num2, res, func):
       hex_res = "  s21_decimal result = {{0x0, 0x0, 0x1, 0x1C0000}};"
       code = 0
   else:
-    hex_res, code = decimal_to_hex_string(res, "result")
+    hex_res, code = decimal_to_equal_string(res, "result")
 
   print("  char *example = \"", num1, " ", func, " ", num2, " = ", res, "\";", sep="")
   print(hex1)
   print(hex2)
   print(hex_res)
   print("  int code = ", code, ";", sep="")
+
+# Converting from py_decimal to structural view of hex massive.
+def decimal_to_equal_string(decimal_value):
+  exponent = 0
+  is_negative = decimal_value < 0
+  if is_negative:
+    decimal_value = -decimal_value
+  
+  while not (decimal_value == decimal_value.to_integral_value()):
+    decimal_value *= 10
+    exponent += 1
+    
+  num_binary = bin(int(decimal_value))[2:]
+  shift = random.randint(1,10)
+  decimal_value2 = decimal_value * (10 ** shift)
+  exponent2 = exponent + shift
+  equal_binary = bin(int(decimal_value2))[2:]
+    
+  def chunk_bits(bit_string, chunk_size):
+    return [bit_string[i:i + chunk_size] for i in range(0, len(bit_string), chunk_size)]
+
+  def bits_to_hex(chunks):
+    return [hex(int(chunk, 2))[2:].upper() for chunk in chunks]
+
+  def hex_format(decimal_value, num_binary, exponent, val):
+    while len(num_binary) > 96 or exponent > 28:
+      decimal_value /= 10
+      exponent -= 1
+      num_binary = bin(int(decimal_value))[2:]
+      if len(num_binary) <= 96 and exponent <= 28:
+        decimal_value = decimal_value.quantize(Decimal('1'), rounding=ROUND_HALF_EVEN)
+        num_binary = bin(int(decimal_value))[2:]
+        break
+
+    padded_binary = num_binary.zfill(((len(num_binary) + 31) // 32) * 32)
+
+    chunk_size = 32
+    binary_chunks = chunk_bits(padded_binary, chunk_size)
+    hex_chunks = bits_to_hex(binary_chunks)
+
+    hex_chunks.reverse()
+
+    while len(hex_chunks) < 3:
+      hex_chunks.append("0")
+
+    formatted_string = f"  s21_decimal {val} = " + "{{" + ", ".join(["0x" + chunk for chunk in hex_chunks])
+
+    last_mantiss = hex((is_negative << 31) | (exponent << 16))[2:].upper()
+    formatted_string += ", {}".format("0x" + last_mantiss) + "}};"
+
+    return formatted_string
+  
+  first = hex_format(decimal_value, num_binary, exponent, "value_1")
+  second = hex_format(decimal_value2, equal_binary, exponent2, "value_2")
+
+  return first, second
 
 # Converting from py_decimal to structural view of hex massive.
 def decimal_to_hex_string(decimal_value, val):
@@ -239,7 +307,7 @@ def decimal_to_hex_string(decimal_value, val):
   while not (decimal_value == decimal_value.to_integral_value()):
     decimal_value *= 10
     exponent += 1
-    
+  
   num_binary = bin(int(decimal_value))[2:]
     
   while len(num_binary) > 96 or exponent > 28:
