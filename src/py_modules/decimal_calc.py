@@ -62,8 +62,12 @@ def int_to_decimal(func):
 # Convert operation "float_to_decimal".
 def float_to_decimal(func):
   num = Decimal(sys.argv[1])
-  res = num
   exponent = 0
+
+  res = np.float32(num) 
+  res = '{:.28f}'.format(res)
+  res = Decimal(res)
+
   if abs(res) < 1:
     integer_part = 0
   else:
@@ -88,7 +92,7 @@ def float_to_decimal(func):
     str_res = str(abs(res))
     str_res = str_res[:8]
     res = Decimal(str_res) / 10 * sign
-    res = res.quantize(Decimal('1e-{}'.format(0)), rounding=ROUND_HALF_EVEN)
+    res = res.quantize(Decimal('1e-{}'.format(0)), rounding=ROUND_HALF_UP)
     res *= 10 ** (integer_part - len(str(abs(res)).split('.')[0]))
   else:
     res = res.normalize()

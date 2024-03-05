@@ -38,7 +38,7 @@ randomize()
   for ((i = 0; i < 28; i++)); do
     value="${value}$((RANDOM % 10))"
 
-    if ((dot == 0 && type == 1 && (RANDOM % 5) == 0)); then
+    if ((dot == 0 && type == 1 && (RANDOM % 3) == 0)); then
       value="${value}."
       dot=1
     fi
@@ -69,7 +69,7 @@ check_for_mistakes()
     value="${value%?}"
   done
 
-  if (((RANDOM % 50) == 0)); then
+  if (((RANDOM % 100) == 0)); then
     if (((RANDOM % 2) == 0)); then
       value="0"
     else
