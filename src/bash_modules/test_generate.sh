@@ -23,7 +23,7 @@ complex_generate_for_tests()
   echo "|__________________________________________________________________|"
   echo -e "${RESET}"
 
-  if [[ ${TEST_TYPE} == "binary" ]]; then
+  if [[ ${TEST_TYPE} == "binary" ]] || [[ ${TEST_TYPE} == "compare" ]]; then
     for ((i = TEST_BEGIN; i < NUMBER_OF_TESTS + TEST_BEGIN; i++)); do
       percent=$(((i - TEST_BEGIN) * 100 / NUMBER_OF_TESTS))
       echo -ne "\rIn progress... Generating test № ${YELLOW}${i}${RESET} (${YELLOW}${percent}%${RESET})."
@@ -54,7 +54,11 @@ generate_binary_test()
   ./dist/decimal_calc/decimal_calc $(generate_float_decimal) "${OPERATION}" $(generate_float_decimal)
   echo "  int count = ${1};"
   echo
-  echo "  ${TEST_FUNCTION}(value_1, value_2, result, code, example, count);"
+  if [[ ${TEST_TYPE} == "compare" ]]; then
+    echo "  ${TEST_FUNCTION}(value_1, value_2, code, example, count);"
+  else
+    echo "  ${TEST_FUNCTION}(value_1, value_2, result, code, example, count);"
+  fi
   echo "}"
   echo
 }
